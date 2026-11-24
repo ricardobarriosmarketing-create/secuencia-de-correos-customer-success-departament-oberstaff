@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oberstaff · Vista previa de la secuencia de correos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf6f8;--panel:#fff;--ink:#2f323a;--mute:#6b6e78;--line:#e6dfe3;--pink:#ff5fc0;--mag:#b91f84;--soft:#f1ebee;--mark:#ffe3f4;--ph:#fff3c4;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1f25;--panel:#272a32;--ink:#f3eef1;--mute:#a7a9b3;--line:#3a3d47;--mag:#ff7fcf;--soft:#31343d;--mark:#5a2447;--ph:#5c4d14;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Inter,system-ui,sans-serif}
+header{background:#2f323a;color:#f7f2f5;padding:22px 28px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between}
+header h1{font:700 22px Outfit,sans-serif;margin:0}header h1 i{color:var(--pink);font-style:normal}
+header p{margin:2px 0 0;color:#c9c5cc;font-size:13px}
+main{max-width:680px;margin:0 auto;padding:32px 16px 80px}
+.mail{margin:0 auto;max-width:640px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:max-width .2s}
+.hd{padding:14px 22px;border-bottom:1px solid var(--line);background:var(--soft);font-size:13px}
+.hd .s{font:600 16px Outfit,sans-serif;margin-bottom:2px}.hd .p{color:var(--mute)}
+.bd{padding:24px 26px 28px}
+.logo{font:700 20px Outfit,sans-serif;margin-bottom:16px}.logo i{color:var(--pink);font-style:normal}
+.bd p{margin:0 0 14px}.bd h3{font:700 16px Outfit,sans-serif;color:var(--mag);margin:22px 0 6px}
+.bd ul{padding-left:20px;margin:0 0 14px}.bd li{margin-bottom:6px}
+.btn{display:inline-block;background:var(--mag);color:#fff;text-decoration:none;padding:9px 18px;border-radius:8px;font-weight:600;font-size:14px;margin:2px 0 12px}
+.note{background:var(--soft);border-left:3px solid var(--pink);padding:8px 12px;font-size:13px;color:var(--mute);margin:0 0 14px;border-radius:0 6px 6px 0}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px}
+.ph{background:var(--ph);border-radius:3px;padding:0 3px;font-size:13px}
+.sig{color:var(--mute);margin-top:18px}
+
+.gh{font:700 14px Outfit,sans-serif;color:var(--mag);text-transform:uppercase;letter-spacing:.08em;margin:44px 4px 14px}.gh:first-child{margin-top:0}
+.tag{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;margin:0 4px 8px;font-size:13px;color:var(--mute)}.tag b{color:var(--ink)}
+.mail{margin:0 auto 34px;max-width:100%}
+@media(max-width:560px){.bd{padding:20px 18px}header{padding:18px}}
+.act{margin:-22px 4px 34px;font-size:13px;color:var(--mute);border-left:3px solid var(--pink);padding:2px 10px}.act b{color:var(--ink)}
+@media print{.mail{break-inside:avoid}}
+
+/* Slots para banner y footer (nuevo) */
+.banner,.footer{margin:0;padding:0;line-height:0}
+.banner img,.footer img{display:block;width:100%;max-width:100%;height:auto}
+.banner{border-bottom:1px solid var(--line)}
+.footer{border-top:1px solid var(--line);margin-top:22px}
+.slot-empty{border:2px dashed var(--line);background:var(--soft);color:var(--mute);font:600 12px Inter,sans-serif;text-align:center;padding:26px 12px;letter-spacing:.04em;text-transform:uppercase}
+@media print{.banner,.footer{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Oberstaff<i>.</i> Programa de emails</h1><p>Vista previa para Customer Success · Noviembre 2026 · 37 correos · Desplázate para revisarlos todos</p></div>
+</header>
+<main id="mails"></main>
+<script>
+
+const SAMPLE={cliente_nombre:"Agencia Ejemplo",analista:"tu analista de Customer Success",nombre:"Camila",rol:"Asistente Virtual",manager_cs:"Lucía Murena",fecha_onboarding:"lunes 2 de diciembre",hora:"10:00 a. m.",huso:"hora de Caracas",tiempo_oberstaff:"1 año",tiempo:"6 meses",tiempo_con_cliente:"6 meses",nombre_cliente:"María",profesional:"Camila",total_clientes:"150",anos_mercado:"5",mes:"diciembre",dia_cumple:"18",herramienta:"Notion",herramienta_descripcion:"Un espacio donde organizar tareas, notas y procesos en un solo lugar.",novedad_1:"[Novedad 1]",novedad_2:"[Novedad 2]",cliente:"tu cliente",fecha_limite_encuesta:"viernes 12 de diciembre",factura_ref:"Agencia Ejemplo · Factura #0042"};
+const SIG="Un abrazo, {{manager_cs}} · Customer Success, Oberstaff";
+const E=[
+{g:"Bienvenida al talento",n:"B1 · Lo lograste",w:"Inmediato, al pasar a “Activo” en Bigin",s:"Oberstaffer, lo lograste: bienvenido/a a Oberstaff",p:"Detrás de tu selección hay mucho trabajo tuyo. Esto es lo que sigue.",b:`Oberstaffer {{nombre}}, ¡lo lograste!
+Antes de cualquier trámite queremos decirte algo: felicidades. Entre todas las personas que aplicaron, la elegida para el cargo de {{rol}} fuiste tú.
+Para llegar hasta aquí revisamos cada CV y cada perfil de LinkedIn, hablamos con tus referencias, te entrevistamos y pasaste pruebas psicológicas, conductuales y técnicas. Es un camino largo y exigente, y lo hacemos así a propósito: queremos que cada cliente pueda confiar en quien llega a acompañarlo. Al final la conclusión fue clara. Eres la persona más capacitada para el cargo, y contigo tu cliente puede cumplir sus objetivos y hacer crecer su empresa.
+Tu esfuerzo dio sus recompensas. Que este sea el primero de muchos logros en tu carrera con Oberstaff.
+Para que empieces con calma, ten a mano tres cosas antes de tu primer día:
+- **Tu invitación de Ontop.** Customer Success te la enviará por correo y mañana te contamos todo sobre ella.
+- **Tu estación de trabajo lista:** laptop con buen rendimiento, cámara y audífonos, respaldo de energía e internet, y un fondo limpio.
+- **Tu LinkedIn actualizado,** con foto profesional y mención de que colaboras con Oberstaff.
+**Tu reunión de onboarding:** {{fecha_onboarding}} a las {{hora}} ({{huso}}).
+[[Agregar a mi calendario]]
+Si algo se complica, recuerda nuestra regla de oro: **avísanos primero a nosotros, antes que al cliente.** Aquí estamos para acompañarte.
+[[Repasar el pre-onboarding]]
+~${SIG}`},
+{g:"Bienvenida al talento",n:"B2 · Ontop, tu nueva forma de cobrar",w:"Día 1 (24 h después de B1) · Nuevo",s:"Oberstaffer, tenemos una sorpresa para ti: conoce Ontop",p:"Una sorpresa pensada para cuidar lo que ganas.",b:`Oberstaffer {{nombre}}, tenemos una sorpresa para ti.
+Queremos presentarte Ontop, la plataforma con la que vas a recibir tus pagos en Oberstaff.
+¿Por qué Ontop? Porque pensamos en lo que ganas con tu trabajo. Las comisiones de plataformas como PayPal pueden superar el 5 % en cada pago, y a fin de año esa diferencia pesa. Ontop es una alternativa a esas comisiones altas. Tomamos esta decisión para proteger tus ingresos, que son fruto de tu esfuerzo.
+Así funciona, en tres pasos:
+- **Revisa tu correo.** El departamento de Customer Success te enviará una invitación para crear tu cuenta de Ontop. Si no la ves, busca también en spam o promociones.
+- **Acepta la invitación.** Es el paso que activa tu cuenta. [PASOS ONTOP: datos o verificación que pide la plataforma, si aplica]
+- **Espera tus pagos.** Se realizan en los primeros 5 días hábiles de cada mes. Guarda esa fecha.
+Si pasan 24 horas y la invitación no llega, responde este correo y la reenviamos hoy mismo.
+Gracias por confiar en nosotros, Oberstaffer. Cuidar tus ingresos es una forma de valorar tu trabajo.
+~${SIG}`},
+{g:"Bienvenida al talento",n:"B3 · Por qué existe tu lugar",w:"Día 2 · Nuevo",s:"Oberstaffer, por qué existe tu lugar en Oberstaff",p:"El contexto detrás de cada oportunidad que conectamos.",b:`Oberstaffer {{nombre}}, queremos contarte algo que no siempre se dice.
+En España, contratar a una persona le suma a quien emprende más de un 30 % sobre el salario bruto, solo en Seguridad Social. Súmale los impuestos. Imagina a quien crea una pyme: antes de ver resultados ya tiene que reunir ese capital cada mes para pagar a su gente.
+En Puerto Rico, muchos empresarios conviven con cortes de luz recurrentes y con costos al alza, y buscan formas de operar sin depender de esa realidad.
+Del otro lado, en varios países de Latinoamérica sabemos lo difícil que es cuidar el ingreso cuando la inflación se come el valor de la moneda local. Ahí vimos la oportunidad: conectar a esas empresas con profesionales como tú, que reciben ingresos competitivos en divisa extranjera y protegen su dinero.
+Esa es la razón de ser de Oberstaff. Cada empresa gana talento de confianza, y tú ganas una oportunidad real de crecer. Tú eres la pieza que une las dos historias.
+Por eso cuidamos tanto la selección, y por eso nos importa cómo te sientes. Si algo de lo que leíste te deja preguntas, responde este correo. Te leemos.
+~${SIG}`},
+{g:"Bienvenida al talento",n:"B4 · Verificación previa",w:"24 h antes del onboarding",s:"Mañana es tu onboarding, Oberstaffer: ¿lo tienes claro?",p:"Dos minutos que evitan malentendidos después.",b:`Oberstaffer {{nombre}}, mañana nos vemos en tu onboarding y queremos que llegues con todo claro.
+Preparamos 5 preguntas de opción múltiple. Toman 2 minutos y no son un examen: nos sirven para saber si te explicamos bien.
+[[Hacer la verificación]]
+Si alguna respuesta te sorprende, mejor. Anótala y llévala a la reunión, ahí la resolvemos juntos.
+~Hasta mañana, {{manager_cs}}`},
+{g:"Bienvenida al talento",n:"B5 · Canales de ayuda",w:"Día 3 de trabajo",s:"Oberstaffer, ¿cómo va tu inicio? A quién escribir según tu duda",p:"Para cada duda, una puerta correcta.",b:`Oberstaffer {{nombre}}, ya van tres días. ¿Cómo te sientes? Cuéntanos con confianza, de verdad nos importa.
+Para que cada duda llegue rápido a la persona correcta, así nos organizamos:
+- **Tareas del día a día:** las dirige tu cliente. Escríbele con confianza.
+- **Pagos, bonificaciones o aumentos:** se gestionan con Finanzas o Customer Success, no directamente con el cliente.
+- **Cualquier incidencia** (caída de internet, falta de acceso, malentendido): avísanos primero a nosotros. Preferimos enterarnos temprano para poder ayudarte.
+Mantén tus reportes puntuales y un canal abierto con nosotros. Cuando hablamos a tiempo, casi todo tiene solución.
+~Un abrazo, {{manager_cs}}`},
+{g:"Bienvenida al talento",n:"B6 · Cómo recibes tu pago",w:"Día 5 de trabajo",s:"Oberstaffer, así recibes tu pago en Ontop",p:"Cuándo llega tu pago y qué hacer si no lo ves.",b:`Oberstaffer {{nombre}}, tu primer pago se acerca y queremos que lo recibas sin sorpresas. Repasemos cómo funciona:
+- **Cuándo:** los pagos se procesan dentro de los primeros 5 días hábiles de cada mes.
+- **Cómo:** a través de Ontop. [PASOS ONTOP: dónde ver el pago, cómo retirarlo, comisiones si aplican]
+- **Si algo no cuadra:** escribe a Finanzas con el asunto “Pago {{nombre}}” y cuéntanos qué ves. Lo revisamos contigo.
+Un último detalle: confirma que aceptaste la invitación de Ontop y que tu cuenta está activa. Si no encuentras la invitación, escríbenos y la reenviamos hoy mismo.
+~Un abrazo, {{manager_cs}}`},
+{g:"Bienvenida al talento",n:"B7 · ¿Te llegó tu primer pago?",w:"Día hábil 7 del mes del primer pago · Nuevo",s:"Oberstaffer, ¿te llegó tu primer pago?",p:"Queremos confirmar que todo salió bien.",b:`Oberstaffer {{nombre}}, ya pasó la fecha de pagos del mes y queremos asegurarnos de que tu primer pago llegó bien.
+Si ya lo tienes, nos alegra mucho. Es el primer resultado concreto de tu trabajo con Oberstaff.
+Si algo no cuadra, o todavía no lo ves, cuéntanos. Responde este correo con una línea y lo revisamos hoy mismo. Y si todo salió bien, también queremos saberlo:
+[[Todo bien]] [[Tengo una duda]]
+Gracias por tu paciencia en estos primeros pasos.
+~Un abrazo, {{manager_cs}}`},
+{g:"Bienvenida al talento",n:"B8 · Primer mes",w:"Día 30",s:"Un mes juntos, Oberstaffer: cuéntanos cómo vas",p:"Tres preguntas y una forma de ganar con nosotros.",b:`Oberstaffer {{nombre}}, ¡ya llevas un mes con nosotros! Gracias por tu esfuerzo.
+Queremos escucharte: cómo te has sentido con tu cliente, con tu rol y con nosotros. Son 3 preguntas y toman un minuto. Leemos cada respuesta.
+[[Responder 3 preguntas (1 min)]]
+Y si conoces a alguien con talento que merezca una oportunidad como la tuya, nuestro programa de referidos te permite ganar por ayudarlo.
+[[Conocer el programa]]
+Gracias por ser parte de Oberstaff.
+~{{manager_cs}}`},
+{g:"Cumpleaños",n:"Feliz cumpleaños",w:"{{fecha_nacimiento}} = hoy · 8:00 a. m. hora local",s:"¡Feliz cumpleaños, Oberstaffer {{nombre}}! 🎂",p:"",b:`> Acciones del flujo: 1) este correo al profesional; 2) aviso interno a Customer Success para un saludo por WhatsApp; 3) con consentimiento, suma al profesional a la sección de cumpleaños de los newsletters.
+Oberstaffer {{nombre}}, hoy es tu día.
+Todo Oberstaff quiere celebrarlo contigo. Gracias por tu compromiso y por la calidad con la que trabajas cada día. Se nota, y lo valoramos.
+Que este nuevo año te traiga salud, buenos proyectos y muchas razones para sonreír.
+> Variante para quien tiene más de un año: añadir “Ya llevas {{tiempo_oberstaff}} con nosotros, y nos encanta verte crecer”.
+~Con cariño, Tu equipo de Oberstaff`},
+{g:"Aniversarios",n:"Aniversario con Oberstaff",w:"{{fecha_ingreso}} + hito: 3 meses, 6 meses, 1 año y cada año",s:"Oberstaffer {{nombre}}, hoy celebramos {{tiempo_oberstaff}} contigo 🎉",p:"",b:`> Se cuenta desde el primer ingreso a Oberstaff, aunque el profesional cambie de cliente. 3 y 6 meses: breve y cálido, con tip de crecimiento. 1 año: celebratorio, con reseña y referidos. 2 años o más: agradecimiento profundo e invitación a ser embajador.
+Oberstaffer {{nombre}}, hoy cumples **{{tiempo_oberstaff}}** en Oberstaff y queremos darte las gracias. Detrás de cada mes hay constancia, responsabilidad y resultados.
+> Solo 1 año:
+Tu experiencia vale mucho para nosotros y queremos escucharla. ¿Nos cuentas cómo ha sido en una reseña corta?
+[[Dejar mi reseña]]
+Y si conoces a alguien como tú, [[recomiéndalo aquí]].
+> 2 años o más:
+Eres parte de quienes hacen que esta comunidad sea lo que es. Nos encantaría escucharte: ¿qué consejo le darías a quien recién llega?
+Gracias por seguir creciendo con nosotros, Oberstaffer.
+~Customer Success, Oberstaff
+> Aviso opcional al cliente: “{{profesional}} cumple hoy {{tiempo_oberstaff}} en Oberstaff. Si quieres, un mensaje tuyo de reconocimiento significa mucho.”`},
+{g:"Newsletter para el talento",n:"Edición 1 · Qué es Oberstaff",w:"Mes 1 · segundo martes de cada mes",s:"Oberstaffer, conoce a los clientes que confían en tu talento",p:"Entender a quién servimos te ayuda a destacar.",b:`> Estructura fija: portada, bienvenidas, cumpleaños, aniversarios, profesional del mes, tip del mes, recordatorio, referidos y botón de reseña. Bloque especial del mes 1: mapa de clientes ideales.
+Oberstaffer {{nombre}}, esta edición es para ti.
+Eres parte de una comunidad de profesionales de Latinoamérica que trabaja de forma remota con empresas de España, Puerto Rico y Estados Unidos. Hoy queremos que conozcas mejor a quienes confían en tu talento.
+**¿Quiénes son nuestros clientes ideales?** Pymes y empresas en crecimiento, de 5 a 100 personas, con cuellos de botella operativos: agencias de marketing y producción, despachos legales, clínicas, empresas de servicios, e-commerce y negocios digitales.
+**¿Qué necesitan?** Asistentes virtuales, traffic managers, diseñadores, editores de video, desarrolladores web, contadores, SDRs y atención al cliente.
+**¿Qué esperan de ti?** Excelencia, respeto a los horarios acordados y confidencialidad absoluta. Tu trabajo es el rostro de Oberstaff ante cada uno de ellos.
+Gracias por estar aquí. Este newsletter se hace pensando en ti: respóndenos este correo si quieres que cubramos algún tema en próximas ediciones. Te leemos.
+[[Ver más sobre Oberstaff]]`},
+{g:"Newsletter para el talento",n:"Edición 2 · Tus pagos",w:"Mes 2",s:"Oberstaffer, todo sobre tus pagos en Ontop, en 2 minutos",p:"",b:`Oberstaffer {{nombre}}, sabemos que lo que más importa es cobrar a tiempo y sin sorpresas. Por eso usamos Ontop: es una alternativa a las altas comisiones de plataformas como PayPal, y elegirla fue una decisión para proteger tus ingresos. Resumen:
+- **Cuándo:** primeros 5 días hábiles de cada mes.
+- **Cómo funciona Ontop:** [PASOS ONTOP]
+- **Si no ves tu pago:** revisa que tu cuenta esté activa y que hayas aceptado la invitación; si sigue sin aparecer, escribe a Finanzas con el asunto “Pago + tu nombre”.
+- **Bonificaciones o aumentos:** se gestionan con Finanzas o Customer Success.
+Guarda este correo. Te será útil cada mes.`},
+{g:"Newsletter para el talento",n:"Edición 3 · Referidos",w:"Mes 3",s:"Oberstaffer, gana recomendando a quien ya merece una oportunidad",p:"",b:`Oberstaffer {{nombre}}, la mayor parte de nuestra comunidad crece por recomendación. Si conoces a alguien con experiencia y buena actitud, tú puedes ser el puente. Tu palabra pesa: cuando recomiendas a alguien, nos dices que confías en esa persona.
+**Cómo funciona:**
+- Envía el contacto en este [formulario].
+- Verificamos que sea nuevo en nuestra base.
+- Si es contratado, recibes [MONTO / CONDICIONES].
+No hay límite de referidos. Es un acuerdo mercantil y la información es confidencial.
+[[Referir ahora]]`},
+{g:"Newsletter para el talento",n:"Edición 4 · Bienestar y foco",w:"Mes 4 · Nuevo",s:"Oberstaffer, cuidar tu energía también es parte del trabajo",p:"Tres hábitos simples para sostener el foco en remoto.",b:`Oberstaffer {{nombre}}, trabajar en remoto exige más autonomía y también más cuidado de tu energía.
+Tres hábitos que sostenemos quienes mejor rinden:
+- **Bloques de foco:** una hora sin notificaciones para la tarea más importante del día.
+- **Cierre diario:** anota lo que quedó pendiente y la siguiente acción concreta.
+- **Pausas reales:** cinco minutos lejos de la pantalla cada 90 minutos.
+No son fórmulas mágicas; son costumbres sostenibles. Si algo te cuesta, escríbenos y lo trabajamos contigo.
+[[Contarnos cómo vas]]
+~Un abrazo, {{manager_cs}} · Customer Success, Oberstaff`},
+{g:"Newsletter para clientes",n:"Newsletter mensual al cliente",w:"Primer miércoles de cada mes · segmentado por mercado",s:"{{nombre_cliente}}, {{profesional}} cumple {{tiempo}} contigo · Novedades de {{mes}}",p:"Números de Oberstaff, una herramienta para tu operación y tu programa de referidos.",b:`# Oberstaff en números
+Hola {{nombre_cliente}},
+Gracias por ser parte de esta historia. Hoy Oberstaff suma **+{{total_clientes}} clientes** y **{{anos_mercado}} años** conectando talento de Latinoamérica con empresas como la tuya.
+# Tu profesional
+**{{profesional}} lleva {{tiempo_con_cliente}} contigo.**
+> Si cumple años este mes:
+Este mes cumple años el {{dia_cumple}}. Un saludo tuyo suma mucho.
+# Novedades
+- {{novedad_1}}
+- {{novedad_2}}
+# Herramienta del mes: {{herramienta}}
+{{herramienta_descripcion}} Ayuda a que {{profesional}} trabaje con más claridad y a ti a tener visibilidad.
+[[Conocer la herramienta]]
+# Programa de referidos
+Si recomiendas a una empresa y contrata con nosotros y permanece como cliente un mes completo, recibes el **3 % de lo facturado durante los siguientes seis meses**. Es un acuerdo mercantil y no crea relación laboral.
+[[Referir una empresa]]
+# Tip del mes
+Define 2 o 3 tareas clave por semana y comparte el “por qué” de cada una. Tu profesional tomará mejores decisiones y se anticipará a tus necesidades.
+# Cierre
+¿Necesitas sumar otro recurso o ajustar algo? Agenda una llamada con Customer Success.
+[[Agendar]]`},
+{g:"Newsletter para clientes",n:"Edición 2 · Cómo aprovechar tu servicio",w:"Mes 2 del cliente · Nuevo",s:"{{nombre_cliente}}, cómo exprimir al máximo tu servicio con {{profesional}}",p:"Tres prácticas de clientes que obtienen más resultados.",b:`# Tres formas de obtener más de tu profesional
+Hola {{nombre_cliente}},
+Gracias por seguir con nosotros. En esta edición compartimos lo que mejor funciona a clientes que ya trabajan con su profesional desde hace meses.
+- **Define prioridades semanales** en lugar de tareas sueltas.
+- **Comparte el “por qué”** de cada encargo: mejora las decisiones autónomas.
+- **Reserva 15 minutos de revisión** al cierre de cada semana.
+# Herramienta del mes: {{herramienta}}
+{{herramienta_descripcion}}
+# Programa de referidos
+Recuerda que si recomiendas a una empresa y contrata con nosotros, recibes el **3 % de lo facturado durante seis meses**.
+[[Referir una empresa]]
+# Cierre
+¿Quieres ajustar algo del servicio? Agenda una llamada con Customer Success.
+[[Agendar]]`},
+{g:"Encuestas y facturación",n:"S1 · Recordatorio de encuesta",w:"72 h después del envío de la encuesta, si no hay respuesta",s:"Oberstaffer, tu opinión nos ayuda a mejorar (y aún no la hemos recibido)",p:"Tienes hasta el {{fecha_limite_encuesta}} para completarla. Son 2 minutos.",a:"Verificar si la encuesta fue abierta; si no, reintentar por WhatsApp antes del cierre.",b:`Oberstaffer {{nombre}}, te escribimos con cariño y sin presión.
+Hace unos días te enviamos una encuesta para medir tu nivel de satisfacción. Todavía no la hemos recibido, y de verdad nos gustaría conocer tu opinión: lo que valoras, lo que te falta y lo que podríamos hacer mejor.
+Tienes hasta el **{{fecha_limite_encuesta}}** para completarla. No hay respuestas correctas ni incorrectas; tu mirada es la que nos ayuda a mejorar.
+[[Completar la encuesta (2 min)]]
+Si ya la llenaste, ignora este mensaje y gracias por tomarte el tiempo.
+~Un abrazo, {{manager_cs}} · Customer Success, Oberstaff`},
+{g:"Encuestas y facturación",n:"S2 · Cierre de encuesta",w:"Último día hábil antes del cierre · Nuevo",s:"{{nombre}}, última llamada: la encuesta cierra el {{fecha_limite_encuesta}}",p:"Un minuto y tu voz queda registrada.",b:`Oberstaffer {{nombre}}, te escribimos por última vez sobre este tema.
+La encuesta de satisfacción cierra el **{{fecha_limite_encuesta}}**. Sabemos que la agenda aprieta, así que la dejamos a un clic y en un minuto.
+[[Responder ahora]]
+Si prefieres contarnos tu opinión por escrito o en una llamada breve, responde este correo y coordinamos. Tu experiencia nos ayuda a cuidar mejor a toda la comunidad.
+~Gracias por tu tiempo, {{manager_cs}} · Customer Success, Oberstaff`},
+{g:"Encuestas y facturación",n:"S3 · Encuesta de cierre de trimestre",w:"Día 90 de la asignación · alineado con C90 y P90",s:"{{nombre}}, ¿cómo fue este trimestre con Oberstaff?",p:"Tres preguntas para cerrar el trimestre con claridad.",b:`Oberstaffer {{nombre}}, cerramos un trimestre más y queremos hacerlo escuchándote.
+Son tres preguntas: qué te funcionó, qué te costó y qué apoyo necesitas. Con tus respuestas ajustamos el acompañamiento del próximo trimestre.
+[[Responder (1 min)]]
+Gracias por tu compromiso. Nos importa cómo te sientes, no solo cómo rindes.
+~Un abrazo, {{manager_cs}} · Customer Success, Oberstaff`},
+{g:"Encuestas y facturación",n:"F1 · Recordatorio de pago de factura",w:"5 días después del envío de la factura, si no hay confirmación",s:"{{nombre_cliente}}, recordatorio amable sobre la factura de {{profesional}}",p:"Un pago a tiempo cuida la gestión de tu profesional.",a:"Confirmar recepción de la factura y registrar fecha compromiso de pago en Bigin.",b:`Hola, {{nombre_cliente}}:
+El pasado te enviamos un correo con la factura correspondiente al pago por honorarios profesionales de tu cliente/a **{{factura_ref}}**.
+Te escribimos con un recordatorio amable: realizar el pago a tiempo contribuye directamente a la correcta gestión de {{profesional}} y a la continuidad del servicio que hoy tienes con nosotros.
+Si ya realizaste el pago, responde este correo con el comprobante y lo registramos hoy mismo. Si necesitas una copia de la factura o tienes alguna duda sobre el proceso, también estamos aquí.
+[[Confirmar pago / solicitar factura]]
+Gracias por tu confianza.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Encuestas y facturación",n:"F3 · Factura próxima a vencer",w:"3 días antes del vencimiento · Nuevo",s:"{{nombre_cliente}}, tu factura vence en 3 días",p:"Un recordatorio preventivo, sin trámites de último minuto.",b:`Hola, {{nombre_cliente}}:
+Te escribimos con un recordatorio preventivo: la factura **{{factura_ref}}** vence en 3 días. Avisar con tiempo evita trámites de último minuto y mantiene la operación de {{profesional}} sin interrupciones.
+[[Ver factura y pagar]]
+Si ya está programada o pagada, ignora este mensaje y mil gracias.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Encuestas y facturación",n:"F2 · Confirmación de pago recibido",w:"Al registrar el pago en Bigin · automático · Nuevo",s:"{{nombre_cliente}}, recibimos tu pago: gracias",p:"",b:`Hola, {{nombre_cliente}}:
+Confirmamos la recepción del pago correspondiente a la factura **{{factura_ref}}**. Gracias por tu puntualidad: eso nos permite sostener la continuidad y la calidad del servicio de {{profesional}}.
+Si necesitas el recibo o algún documento adicional, responde este correo y te lo enviamos.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C0 · Bienvenida e integración",w:"Día 0 · Antes del onboarding, al iniciar la asignación",s:"Bienvenida e integración de {{profesional}} a tu operación",p:"Tu sesión de onboarding y tres cosas para preparar antes.",a:"Confirmar asistencia y tres primeras prioridades antes del onboarding.",b:`Hola, {{nombre_cliente}}:
+Gracias por confiar en nosotros. Nos alegra darte la bienvenida a esta nueva etapa junto a {{profesional}}, y queremos que el inicio sea ordenado y tranquilo.
+**Tu sesión de onboarding:** {{fecha_onboarding}} a las {{hora}} ({{huso}}).
+[[Unirme a la sesión]]
+En la reunión validaremos juntos tres puntos:
+- Los objetivos principales del rol.
+- Las herramientas y accesos necesarios.
+- La forma de comunicar prioridades y avances.
+Para aprovecharla mejor, te invitamos a identificar antes de la sesión las tres primeras tareas que quieres delegar y cómo reconocerás que quedaron bien hechas.
+[[Confirmar asistencia y mis 3 prioridades]]
+Tu contacto en Customer Success será {{analista}}. Estamos a tu disposición para acompañarte en cada paso.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C7 · Organizar la primera semana",w:"Día 7 · Recurso de valor",s:"Una forma sencilla de organizar la primera semana",p:"Tres prioridades, un resultado claro y una fecha de revisión.",a:"Que el cliente envíe una lista de tres prioridades y la primera fecha de revisión.",b:`Hola, {{nombre_cliente}}:
+Para ayudar a {{profesional}} a enfocarse en lo importante, te proponemos una dinámica que toma solo unos minutos: elegir tres prioridades, describir el resultado esperado de cada una y fijar una fecha clara de revisión.
+# Un ejemplo
+> En vez de “organizar los datos”, indica “consolidar el reporte de ventas de lunes a viernes con las columnas X, Y y Z, y enviarlo el viernes”.
+Un mensaje al inicio de la semana y una revisión breve al cierre suelen evitar dudas y retrabajo.
+Si te sirve, con gusto te ayudamos a adaptar este formato a tu operación.
+[[Enviar mis 3 prioridades]]
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C21 · Feedback que mejora resultados",w:"Día 21 · Aprendizaje",s:"Cómo dar retroalimentación que realmente mejore resultados",p:"Un formato de tres elementos para dar claridad sin microgestionar.",a:"Que el cliente identifique una mejora concreta y la comunique con el formato de tres elementos.",b:`Hola, {{nombre_cliente}}:
+Cuando detectas algo que puede mejorar, el feedback más útil combina tres elementos:
+- **Qué sucedió.**
+- **Qué efecto tuvo.**
+- **Qué esperas la próxima vez.**
+# Un ejemplo
+> “En el último reporte faltaron dos registros, por eso tuvimos que revisarlo otra vez. Para el siguiente, usa esta lista de verificación antes de enviarlo”.
+El objetivo no es supervisar más, sino dar claridad para que {{profesional}} gane autonomía y confianza.
+Si quieres, te compartimos una plantilla breve para registrar acuerdos.
+[[Quiero la plantilla]]
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C37 · Tablero semanal",w:"Día 37 · Recurso mes 2",s:"Tu tablero semanal en cuatro columnas",p:"Visibilidad sin interrumpir a tu profesional.",a:"Revisar si existen tareas sin responsable, fecha o criterio de finalización.",b:`Hola, {{nombre_cliente}}:
+A medida que la relación de trabajo se consolida, un tablero sencillo te da visibilidad sin tener que interrumpir a {{profesional}} continuamente. Puedes organizarlo en cuatro columnas:
+- Pendiente
+- En curso
+- Bloqueado
+- Terminado
+Agrega a cada tarea una fecha de entrega y una definición breve de “terminado”. Una revisión de diez minutos a mitad de semana permite destrabar lo importante sin microgestión.
+Si ya usas una herramienta de trabajo, esta misma lógica se puede aplicar allí, sin duplicar registros.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C52 · Detectar un problema a tiempo",w:"Día 52 · Recurso mes 2",s:"Detectar un problema temprano facilita resolverlo",p:"Cuatro datos que nos ayudan a actuar rápido.",a:"Que el cliente comparta cualquier incidencia abierta y acordar una fecha de respuesta.",b:`Hola, {{nombre_cliente}}:
+Si aparece una dificultad de comunicación, una entrega se retrasa o cambia una prioridad, conviene avisarnos apenas lo notes. Con estos cuatro datos podemos ayudarte mucho más rápido:
+- Qué pasó.
+- Cuándo ocurrió.
+- Qué impacto tuvo.
+- Qué apoyo necesitas.
+Con esa información, Customer Success evalúa la situación, coordina la revisión que corresponda y da seguimiento hasta llegar a una solución concreta.
+No hace falta esperar a la próxima llamada: estamos disponibles por los canales habituales.
+[[Escribir a Customer Success]]
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C72 · Impacto del trabajo delegado",w:"Día 72 · Recurso mes 3",s:"¿Qué impacto está teniendo el trabajo delegado?",p:"Tres indicadores sencillos para mirar más allá del número de tareas.",a:"Que el cliente elija una evidencia del valor aportado y la comparta en la llamada.",b:`Hola, {{nombre_cliente}}:
+A estas alturas vale la pena mirar más allá de cuántas tareas se completaron. Te proponemos revisar tres indicadores sencillos:
+- Actividades que ya no requieren tu intervención.
+- Entregas que hoy salen con mayor consistencia.
+- Tiempo de coordinación que se ha reducido.
+No hace falta medirlo todo. Elige una sola mejora observable y compárala con el punto de partida del primer mes.
+En nuestra próxima conversación revisamos ese resultado juntos y definimos un objetivo práctico para el siguiente trimestre.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Clientes (días 0 a 90)",n:"C90 · Cierre del trimestre",w:"Día 90 · Evaluación",s:"Cerramos el trimestre: resultados y próximos objetivos",p:"Tu experiencia nos ayuda a construir la siguiente etapa.",a:"Registrar CSAT/NPS según la encuesta vigente y compartir el compromiso de mejora.",b:`Hola, {{nombre_cliente}}:
+¡Ya completamos los primeros 90 días de acompañamiento! Gracias por tu confianza. Queremos construir la siguiente etapa a partir de tu experiencia.
+Te invitamos a responder una evaluación breve y a contarnos tres cosas:
+- Un resultado que deseas mantener.
+- Un aspecto por mejorar.
+- Una meta para el próximo trimestre.
+[[Responder la evaluación]]
+Con tus comentarios orientaremos el seguimiento y, cuando corresponda, te compartiremos recursos específicos para que el servicio siga aportándote valor.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P0 · Tu inicio con el cliente",w:"Día 0 · Inicio de la asignación",s:"Tu inicio con {{cliente_nombre}}: información y primeros pasos",p:"Todo lo que necesitas para arrancar con claridad.",a:"Confirmar que recibió la información y registrar accesos pendientes.",b:`Oberstaffer {{nombre}}, ¡empezamos una nueva asignación!
+Te damos la bienvenida a esta etapa con {{cliente_nombre}}. Antes de comenzar, verifica que tienes a mano:
+- Tu rol y fecha de inicio.
+- El horario y los canales acordados.
+- Tus accesos y la persona de contacto.
+Para tu primera semana te recomendamos confirmar por escrito las prioridades y el formato esperado de cada entrega. Si falta un acceso o una instrucción, avísanos cuanto antes: preferimos ayudarte a tiempo.
+En el onboarding revisaremos juntos las herramientas, la dinámica de comunicación y los recursos de apoyo y formación.
+[[Confirmar que recibí la información]]
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P7 · Tres hábitos para trabajar en remoto",w:"Día 7 · Recurso",s:"Tres hábitos para trabajar con claridad en remoto",p:"Una rutina simple que te da visibilidad y tranquilidad.",a:"Que ponga en práctica un resumen corto al cierre durante la semana.",b:`Oberstaffer {{nombre}}, queremos compartirte una rutina simple para ganar consistencia:
+- **Al iniciar,** confirma tus prioridades.
+- **Durante el día,** registra avances y bloqueos.
+- **Al terminar,** resume lo completado y lo que sigue.
+# Un ejemplo de cierre
+> “Hoy terminé A y B. C quedó pendiente por falta de un dato. Mañana continúo con D y necesito validar un punto.”
+Esta práctica mantiene la visibilidad y evita que los problemas se conozcan demasiado tarde.
+Esta semana, ¿te animas a probar el resumen de cierre? Si algo no te funciona, cuéntanos y lo ajustamos contigo.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P21 · Confirmar instrucciones",w:"Día 21 · Aprendizaje",s:"Cómo confirmar instrucciones y evitar retrabajo",p:"Una pregunta a tiempo ahorra horas de correcciones.",a:"Que elija una tarea y confirme sus criterios de entrega antes de ejecutarla.",b:`Oberstaffer {{nombre}}, cuando una solicitud es nueva o poco clara, una pregunta a tiempo evita horas de correcciones. Antes de empezar, valida:
+- El resultado esperado.
+- El formato.
+- La fecha.
+- Las referencias disponibles.
+Puedes usar esta frase:
+> “Para confirmar, entregaré [resultado] con [formato] antes del [fecha]. ¿Hay algún ejemplo o criterio adicional que deba considerar?”
+Recuerda: comunicar una duda no es una debilidad, es una práctica de calidad. Y tus preguntas son bienvenidas.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P37 · Checklist de calidad",w:"Día 37 · Recurso mes 2",s:"Checklist de calidad antes de entregar",p:"Dos minutos de revisión que evitan correcciones.",a:"Que cree o actualice un checklist de una tarea frecuente.",b:`Oberstaffer {{nombre}}, una revisión de dos minutos puede ahorrarte muchas correcciones. Antes de enviar una tarea, comprueba cinco puntos:
+- El contenido es correcto.
+- El formato es el solicitado.
+- Los datos están completos.
+- Los enlaces o adjuntos funcionan.
+- La siguiente acción queda clara.
+Si tienes tareas recurrentes, convierte esta lista en una plantilla personal. Así mantendrás la calidad incluso cuando aumente el volumen de trabajo.
+Si quieres reforzar alguna habilidad, cuéntanos y te orientamos con un recurso de formación.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P52 · Prioridades claras",w:"Día 52 · Recurso mes 2",s:"Prioridades claras cuando todo parece urgente",p:"Cómo ordenar varias solicitudes y reportar un bloqueo.",a:"Que aplique una clasificación de prioridades y reporte un bloqueo con contexto.",b:`Oberstaffer {{nombre}}, si recibes varias solicitudes a la vez, no asumas que todas tienen la misma urgencia. Ordénalas por:
+- Fecha comprometida.
+- Impacto.
+- Dependencias.
+Después, confirma con la persona responsable en {{cliente_nombre}} qué se atiende primero.
+Si aparece un bloqueo, cuéntanos qué necesitas, desde cuándo y qué tarea queda afectada. Esa claridad acelera las decisiones y protege la calidad de tu trabajo.
+¿No estás seguro/a de qué canal usar para plantear una dificultad? Customer Success te orienta con gusto.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P67 · Autonomía responsable",w:"Día 67 · Recurso mes 3",s:"Autonomía responsable: anticípate sin cambiar el proceso",p:"Cómo proponer mejoras pequeñas con criterio.",a:"Que prepare una propuesta sencilla y la valide con el responsable.",b:`Oberstaffer {{nombre}}, con más experiencia en tu rol ya puedes detectar mejoras pequeñas: una plantilla que evite pasos repetidos, una validación que reduzca errores o una forma más clara de informar avances.
+Cuando tengas una idea, propónla con este formato:
+> Situación actual / mejora sugerida / beneficio esperado.
+Antes de modificar un proceso, confirma la aprobación de la persona responsable. La proactividad aporta valor cuando se combina con comunicación y criterio.
+Tus ideas nos importan. Si quieres comentar una con nosotros antes de llevarla al cliente, escríbenos.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P82 · Tu siguiente paso de desarrollo",w:"Día 82 · Recurso mes 3",s:"Tu siguiente paso de desarrollo profesional",p:"Elige una habilidad para fortalecer el próximo trimestre.",a:"Que defina una competencia, una práctica y una fecha para revisar su avance.",b:`Oberstaffer {{nombre}}, en estos meses has acumulado experiencia real con tu cliente, y queremos ayudarte a seguir creciendo.
+Te invitamos a elegir una habilidad para fortalecer el próximo trimestre:
+- Organización.
+- Comunicación.
+- Calidad.
+- Herramientas digitales.
+- Conocimiento del proceso.
+Una buena meta es específica y observable. Por ejemplo: “reducir las correcciones del reporte recurrente con un checklist, y validar su eficacia durante cuatro entregas”.
+Cuéntanos tu prioridad y te recomendamos una cápsula o recurso de aprendizaje.
+[[Elegir mi habilidad]]
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`},
+{g:"Secuencia CS · Profesionales (días 0 a 90)",n:"P90 · Balance de tus primeros 90 días",w:"Día 90 · Evaluación",s:"Balance de tus primeros 90 días y plan de crecimiento",p:"Queremos escuchar tu experiencia.",a:"Registrar pulso, fortalezas y una acción formativa con fecha.",b:`Oberstaffer {{nombre}}, estás llegando al cierre de tus primeros 90 días en esta asignación y queremos escucharte. Nos interesa saber qué te ha funcionado, qué dificultades siguen y qué apoyo o formación te ayudaría a rendir mejor.
+Te compartimos un pulso breve y te invitamos a mencionar un logro concreto y una habilidad que quieras seguir desarrollando.
+[[Responder mi pulso (1 min)]]
+Gracias por tu compromiso. Nuestro objetivo es acompañarte con herramientas útiles y seguimiento oportuno.
+~Un abrazo, {{analista}} · Customer Success, Oberstaff`}
+];
+
+const val=k=>SAMPLE[k]!==undefined?SAMPLE[k]:k;
+function inline(t){return t.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\[\[(.+?)\]\]/g,'<a class="btn" href="#" onclick="return false">$1</a>').replace(/\{\{(\w+)\}\}/g,(m,k)=>"<mark>"+val(k)+"</mark>").replace(/\[((?:PASOS ONTOP|MONTO|formulario)[^\]]*)\]/g,'<span class="ph">[$1]</span>')}
+function render(body){let h="",ul=false;const close=()=>{if(ul){h+="</ul>";ul=false}};
+body.split("\n").forEach(l=>{if(l.startsWith("- ")){if(!ul){h+="<ul>";ul=true}h+="<li>"+inline(l.slice(2))+"</li>";return}close();
+if(l.startsWith("# "))h+="<h3>"+inline(l.slice(2))+"</h3>";else if(l.startsWith("> "))h+='<div class="note">'+inline(l.slice(2))+"</div>";else if(l.startsWith("~"))h+='<p class="sig">'+inline(l.slice(1))+"</p>";else if(l.startsWith("[["))h+="<p>"+inline(l)+"</p>";else h+="<p>"+inline(l)+"</p>"});close();return h}
+
+function slot(src,alt,cls){
+  if(!src) return '<div class="'+cls+' slot-empty">Espacio para '+((cls==="banner")?"banner":"footer")+' · colocar imagen</div>';
+  return '<div class="'+cls+'"><img src="'+src+'" alt="'+(alt||"")+'"></div>';
+}
+
+document.getElementById("mails").innerHTML=E.map((e,i)=>{
+  const gh=(i===0||E[i-1].g!==e.g)?'<h2 class="gh">'+e.g+'</h2>':"";
+  return gh+'<section id="c'+(i+1)+'">'+
+    '<div class="tag"><span><b>'+(i+1)+' de '+E.length+' · '+e.n+'</b></span><span>'+inline(e.w)+'</span></div>'+
+    '<article class="mail">'+
+      slot(e.banner,"Banner de "+e.n,"banner")+
+      '<div class="hd"><div class="s">'+inline(e.s)+'</div>'+(e.p?'<div class="p">'+e.p+'</div>':"")+'</div>'+
+      '<div class="bd"><div class="logo">Oberstaff<i>.</i></div>'+render(e.b)+'</div>'+
+      slot(e.footer,"Footer de Oberstaff","footer")+
+    '</article>'+
+    (e.a?'<div class="act"><b>Seguimiento interno de CS:</b> '+e.a+'</div>':"")+
+    '</section>';
+}).join("");
+</script>
+</body>
+</html>
