@@ -374,6 +374,56 @@ function slot(src,alt,cls){
   return '<div class="'+cls+'"><img src="'+src+'" alt="'+(alt||"")+'"></div>';
 }
 
+/* ===== CREATIVOS (banner y footer) ===== */
+const IMG={
+  info:  "Customer success header - 1 (1).png", // banner: Información importante que debes de saber
+  logro: "Customer success header - 1.png",     // banner: ¡Oberstaffer, lo lograste!
+  dudas: "Customer success footer - 2 (1).png", // footer: Estamos aquí para aclarar todas tus dudas
+  exito: "Customer success footer - 2.png"      // footer: Tu éxito desde el primer día es nuestra prioridad
+};
+// Orden idéntico al de la lista E (37 correos): [banner, footer]
+const ART=[
+  ["logro","exito"], // 1  B1 · Lo lograste
+  ["info","dudas"],  // 2  B2 · Ontop (aceptar invitación)
+  ["info","dudas"],  // 3  B3 · Por qué existe tu lugar
+  ["info","dudas"],  // 4  B4 · Verificación previa (acción)
+  ["info","dudas"],  // 5  B5 · Canales de ayuda
+  ["info","dudas"],  // 6  B6 · Cómo recibes tu pago
+  ["info","dudas"],  // 7  B7 · ¿Te llegó tu primer pago?
+  ["logro","exito"], // 8  B8 · Primer mes (reconocimiento)
+  ["logro","exito"], // 9  Feliz cumpleaños
+  ["logro","exito"], // 10 Aniversario
+  ["info","dudas"],  // 11 Newsletter talento · Ed. 1
+  ["info","dudas"],  // 12 Newsletter talento · Ed. 2 (pagos)
+  ["info","dudas"],  // 13 Newsletter talento · Ed. 3 (referidos)
+  ["info","exito"],  // 14 Newsletter talento · Ed. 4 (bienestar)
+  ["info","dudas"],  // 15 Newsletter mensual cliente
+  ["info","dudas"],  // 16 Newsletter cliente · Ed. 2
+  ["info","dudas"],  // 17 S1 · Recordatorio encuesta
+  ["info","dudas"],  // 18 S2 · Cierre de encuesta
+  ["info","exito"],  // 19 S3 · Encuesta de trimestre
+  ["info","dudas"],  // 20 F1 · Recordatorio de pago
+  ["info","dudas"],  // 21 F3 · Factura próxima a vencer
+  ["logro","exito"], // 22 F2 · Pago recibido (agradecimiento)
+  ["info","exito"],  // 23 C0
+  ["info","exito"],  // 24 C7
+  ["info","exito"],  // 25 C21
+  ["info","exito"],  // 26 C37
+  ["info","dudas"],  // 27 C52 (reportar problemas)
+  ["info","exito"],  // 28 C72
+  ["info","exito"],  // 29 C90
+  ["info","exito"],  // 30 P0
+  ["info","exito"],  // 31 P7
+  ["info","dudas"],  // 32 P21 (confirmar dudas)
+  ["info","exito"],  // 33 P37
+  ["info","dudas"],  // 34 P52 (bloqueos)
+  ["info","dudas"],  // 35 P67 (ideas)
+  ["logro","exito"], // 36 P82 (reconocimiento de experiencia)
+  ["info","exito"]   // 37 P90
+];
+E.forEach((e,i)=>{ if(ART[i]){ e.banner=IMG[ART[i][0]]; e.footer=IMG[ART[i][1]]; } });
+/* ===== FIN CREATIVOS ===== */
+
 document.getElementById("mails").innerHTML=E.map((e,i)=>{
   const gh=(i===0||E[i-1].g!==e.g)?'<h2 class="gh">'+e.g+'</h2>':"";
   return gh+'<section id="c'+(i+1)+'">'+
